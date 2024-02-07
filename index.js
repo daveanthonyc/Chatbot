@@ -17,7 +17,7 @@ bot.on(message('text'), async (ctx) => {
     const lines = ctx.message.text.split('\n');
     const firstLine = lines[0];
 
-    if (firstLine.includes("Wednesday Service Attendance") && firstLine.includes("💒") && ctx.message.text.includes('/calculate')) {
+    if (firstLine.includes("Wednesday Service Attendance") && firstLine.includes("💒") && ctx.message.text.includes('/add')) {
         // parse O1
         const o1 = transformRawLine(lines[4]);
         const o2 = transformRawLine(lines[5]);
