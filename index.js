@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const bot = new Telegraf(process.env.BOT_TOKEN)
+console.log("this has started");
 
 bot.command('quit', async (ctx) => {
   // Explicit usage
@@ -18,25 +19,28 @@ bot.on(message('text'), async (ctx) => {
     const firstLine = lines[0];
 
     if (firstLine.includes("Wednesday Service Attendance") && firstLine.includes("💒") && ctx.message.text.includes('/add')) {
-        // parse O1
-        const o1 = transformRawLine(lines[4]);
-        const o2 = transformRawLine(lines[5]);
-        const o3 = transformRawLine(lines[6]);
+        try {
+            // parse O1
+            const o1 = transformRawLine(lines[4]);
+            const o2 = transformRawLine(lines[5]);
+            const o3 = transformRawLine(lines[6]);
 
-        const totaledArrays = sumArrays(o1,o2,o3);
+            const totaledArrays = sumArrays(o1,o2,o3);
 
-        // add in brackets to finalied array
-        const finalArray = insertBrackets(totaledArrays);
-        const totalPeopleInDep = finalArray[0];
-        const totalAbsentee = finalArray[finalArray.length-1];
-        const totalAttendees = totalPeopleInDep - totalAbsentee;
-        const attendancePercentage = Math.floor(totalPeopleInDep / totalAttendees * 100);
-        const finalTotal = finalArray.join('/');
-        const addedStrig = `\nTotal: ${finalTotal}\n\nParticipation rate: ${totalPeopleInDep}/${totalAttendees} - ${attendancePercentage}%`
+            // add in brackets to finalied array
+            const finalArray = insertBrackets(totaledArrays);
+            const totalPeopleInDep = finalArray[0];
+            const totalAbsentee = finalArray[finalArray.length-1];
+            const totalAttendees = totalPeopleInDep - totalAbsentee;
+            const attendancePercentage = Math.floor(totalPeopleInDep / totalAttendees * 100);
+            const finalTotal = finalArray.join('/');
+            const addedStrig = `\nTotal: ${finalTotal}\n\nParticipation rate: ${totalPeopleInDep}/${totalAttendees} - ${attendancePercentage}%`
 
-        // join at specific points
-        await ctx.reply(lines.slice(0,7).concat(addedStrig).join('\n'));
-
+            // join at specific points
+            await ctx.reply(lines.slice(0,7).concat(addedStrig).join('\n'));
+        } catch (error) {
+            await ctx.reply('The form might not have all the proper numbers and forward slashes. Please review.');
+        }
     }   // Using context shortcut
 })
 
