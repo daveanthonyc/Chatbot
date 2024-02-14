@@ -32,7 +32,7 @@ bot.on(message('text'), async (ctx) => {
             const totalPeopleInDep = finalArray[0];
             const totalAbsentee = finalArray[finalArray.length-1];
             const totalAttendees = totalPeopleInDep - totalAbsentee;
-            const attendancePercentage = Math.floor(totalPeopleInDep / totalAttendees * 100);
+            const attendancePercentage = Math.floor(totalAttendees / totalPeopleInDep * 100);
             const finalTotal = finalArray.join('/');
             const addedStrig = `\nTotal: ${finalTotal}\n\nParticipation rate: ${totalPeopleInDep}/${totalAttendees} - ${attendancePercentage}%`
 
@@ -58,8 +58,6 @@ function sumArrays(arr1, arr2, arr3) {
     }
     return result;
 }
-
-// 0 1 234 5 6789 10
 
 function insertBrackets(inputArray) {
     const p1 = inputArray[0];
