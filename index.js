@@ -1,6 +1,6 @@
 import { Telegraf } from 'telegraf'
 import { message } from 'telegraf/filters'
-import dotenv from 'dotenv';
+import dotenv, { parse } from 'dotenv';
 dotenv.config();
 
 const bot = new Telegraf(process.env.BOT_TOKEN)
@@ -32,9 +32,9 @@ bot.on(message('text'), async (ctx) => {
             const totalPeopleInDep = finalArray[0];
             const totalAbsentee = finalArray[finalArray.length-1];
             const totalAttendees = totalPeopleInDep - totalAbsentee;
-            const attendancePercentage = Math.floor(totalAttendees / totalPeopleInDep * 100);
+            const attendancePercentage = Math.round(totalAttendees * 100 / totalPeopleInDep);
             const finalTotal = finalArray.join('/');
-            const addedStrig = `\nTotal: ${finalTotal}\n\nParticipation rate: ${totalPeopleInDep}/${totalAttendees} - ${attendancePercentage}%`
+            const addedStrig = `\nTotal: ${finalTotal}\n\nParticipation rate: ${totalAttendees}/${totalPeopleInDep} - ${attendancePercentage}%`
 
             // join at specific points
             await ctx.reply(lines.slice(0,7).concat(addedStrig).join('\n'));
@@ -42,7 +42,68 @@ bot.on(message('text'), async (ctx) => {
             await ctx.reply('The form might not have all the proper numbers and forward slashes. Please review.');
         }
     }   // Using context shortcut
+
+    if ( firstLine.includes("✨ Wednesday Service") && ctx.message.text.includes('/report') ) {
+        try {
+            const finalStr = parseWedAttendance(ctx.message.text);
+            ctx.reply(finalStr);
+        } catch(err) {
+            ctx.reply("There was an error")
+        }
+    }
 })
+
+
+export function parseWedAttendance(str) {
+    const splitLines = str.split('\n');
+
+    const firstLine = splitLines[0];
+    if (!firstLine.includes('✨ Wednesday Service')) {
+        throw new Error("This is not a Wednesday Service Form");
+    }
+
+    const arr = [];
+
+    let count = 0;
+    const SECOND_LINE = 3;
+    for (let i = SECOND_LINE; i < splitLines.length; i++) {
+
+        if (splitLines[i].includes("OFFLINE") || splitLines[i].includes("ONLINE")) {
+            count = 0;
+            continue;
+        }
+
+        const EMPTY_STRING = (splitLines[i].length === 0);
+        if (!EMPTY_STRING) {
+            count++;
+        } else {
+            arr.push(count);
+        }
+    }
+
+    const finalStr = transformWedArrayToReportFormat(arr);
+    return finalStr;
+}
+
+function transformWedArrayToReportFormat(arr) {
+    const GROUP_TOTAL = 20;
+    const sevenOFFLINE = arr[0];
+    const sevenONLINE = arr[1];
+    const twelveOFFLINE = arr[2];
+    const twelveONLINE = arr[3];
+    const sevenPMONLINE = arr[4];
+    const tenOFFLINE = arr[5];
+    const tenONLINE = arr[6];
+
+    const TOTAL_OFFLINE = sevenOFFLINE + twelveOFFLINE + tenOFFLINE;
+    const TOTAL_ONLINE = sevenONLINE + twelveONLINE + sevenPMONLINE + tenONLINE;
+    
+    const TBC = GROUP_TOTAL - TOTAL_OFFLINE - TOTAL_ONLINE;
+
+    const finalStr = `${GROUP_TOTAL} / ${TOTAL_OFFLINE}(${sevenOFFLINE}/${twelveOFFLINE}/${tenOFFLINE}) / ${TOTAL_ONLINE}(${sevenONLINE}/${twelveONLINE}/${sevenPMONLINE}/${tenONLINE}) / ${TBC} TBC`
+
+    return finalStr;
+}
 
 function transformRawLine(str) {
     const values = str.split("-")[1];
