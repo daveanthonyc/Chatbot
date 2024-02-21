@@ -2,6 +2,11 @@
 
 This is a Telegram chatbot that is built in Node.js with the Telegraf API in a docker container. It simply takes in a Telegram message and checks if it is a specific attendance form and parses it to produce the total attendance and replies it back to the Telegram chat.
 
+## Techstack choice 
+- I had previous issues with resolving dependency issues when isntalling the node.js chatbot on an AWS server, hence I saw the need to learn and implement Docker.
+- The telegram chatbot didn't need strict performance criteria as it doesn't have to parse large sets of data, hence node.js was used.
+- The Telegraf library provides a very simple API to access the incoming text from users to parse and also simple methods to reply back a string to the Telegram chat.
+
 ## Installation
 - Clone the repository
 - Build the Docker Image: 
