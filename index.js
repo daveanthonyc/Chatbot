@@ -25,6 +25,13 @@ bot.on(message('text'), async (ctx) => {
             const o2 = transformRawLine(lines[5]);
             const o3 = transformRawLine(lines[6]);
 
+            // uncertain if index position reflects correct values: group total / offline + online attendance
+            const groups = [
+                { name: "O1", total: o1[0], attendees: (Number(o1[1]) + Number(o1[5]) + Number(o1[10]))},
+                { name: "O2", total: o2[0], attendees: (Number(o2[1]) + Number(o2[5]) + Number(o2[10]))},
+                { name: "O3", total: o3[0], attendees: (Number(o3[1]) + Number(o3[5]) + Number(o3[10]))},
+            ]
+
             const totaledArrays = sumArrays(o1,o2,o3);
 
             // add in brackets to finalied array
@@ -37,7 +44,19 @@ bot.on(message('text'), async (ctx) => {
             const addedStrig = `\nTotal: ${finalTotal}\n\nParticipation rate: ${totalAttendees}/${totalPeopleInDep} - ${attendancePercentage}%`
 
             // join at specific points
-            await ctx.reply(lines.slice(0,7).concat(addedStrig).join('\n'));
+
+            let errorFlag = false;
+
+            groups.forEach((group) => {
+                if (Number(group.total) !== Number(group.attendees)) {
+                    errorFlag = true;
+                    ctx.reply(`⚠️ ${group.name} has a calculation error. Their group total is ${group.total} but their attendees and TBC add up to ${group.attendees}. ⚠️`);
+                }
+            })
+
+            if (!errorFlag) {
+                await ctx.reply(lines.slice(0,7).concat(addedStrig).join('\n'));
+            }
         } catch (error) {
             await ctx.reply('The form might not have all the proper numbers and forward slashes. Please review.');
         }
@@ -63,9 +82,9 @@ export function parseWedAttendance(str) {
     }
 
     const arr = [];
-
     let count = 0;
     const SECOND_LINE = 3;
+
     for (let i = SECOND_LINE; i < splitLines.length; i++) {
 
         if (splitLines[i].includes("OFFLINE") || splitLines[i].includes("ONLINE")) {
