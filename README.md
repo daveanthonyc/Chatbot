@@ -9,11 +9,33 @@ This is a Telegram chatbot that is built in Node.js with the Telegraf API in a d
 
 ## Installation
 - Clone the repository
-- Build the Docker Image: 
-`docker build -t Docker-Chatbot .`
+`docker pull daveanthonyc/docker-chatbot:1.0`
+`docker run -d --name container-name -p 80:80 daveanthonyc/dockerchatbot:1.0`
 
 - Run the Docker Image:
 `docker run -d -p 8080:80 image-name`
+
+# When updating application
+- Build Image
+`docker build -t daveanthonyc/docker-chatbot:1.0 .`
+
+- Push changes to DockerHub
+`docker push daveanthonyc/docker-chatbot:1.0`
+
+- Connect to AWS server and enter tmux sesesion
+`docker pull daveanthonyc/docker-chatbot:1.0`
+
+- Check for current containers
+`docker ps -a`
+
+- Stop container
+`docker stop CONTAINER_ID`
+
+- Remove container
+`docker rm CONTAINER_ID`
+
+- Run newest docker image
+`docker run -d --name container_name -p 80:80 daveanthonyc/chatbot:1.0`
 
 # Product Development Case Study: Streamlining Group Attendance Calculation with Telegram Chatbot
 
