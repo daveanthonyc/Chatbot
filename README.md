@@ -43,7 +43,7 @@ This is a Telegram chatbot that is built in Node.js with the Telegraf API in a d
 
 - Run newest docker image
 
-`docker run -d --name container_name -p 80:80 daveanthonyc/chatbot:1.0`
+`docker run -d --name container_name -p 80:80 daveanthonyc/docker-chatbot:1.0`
 
 # Product Development Case Study: Streamlining Group Attendance Calculation with Telegram Chatbot
 
