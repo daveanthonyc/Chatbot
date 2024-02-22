@@ -70,6 +70,15 @@ bot.on(message('text'), async (ctx) => {
             ctx.reply("There was an error")
         }
     }
+
+    if (firstLine.includes('📌  "Examination of Heaven"') && ctx.message.text.includes('/calc'))  {
+        try {
+            const finalStr = heavenlyExamParser(ctx.message.text);
+            ctx.reply(finalStr);
+        } catch (err) {
+            ctx.reply("There was an error")
+        }
+    }
 })
 
 
@@ -101,6 +110,55 @@ export function parseWedAttendance(str) {
     }
 
     const finalStr = transformWedArrayToReportFormat(arr);
+    return finalStr;
+}
+
+export function heavenlyExamParser(str) {
+    const counts = {
+        A: 0,
+        B: 0,
+        C: 0,
+        D: 0,
+        E: 0,
+        F: 0,
+        G: 0,
+    } 
+
+    const splitLines = str.split('\n');
+    const tbcPeople = [];
+
+    for (let i = 8 ; i < splitLines.length; i++) {
+        const separate = splitLines[i].split('/');
+
+        const IS_NOT_MEMBER = (separate.length < 2);
+        if (IS_NOT_MEMBER || !separate[2]) {
+            continue;
+        }
+
+        const examLevel = separate[2].trimStart()[0];
+
+        if (examLevel in counts) {
+            counts[examLevel]++;
+        } else {
+            tbcPeople.push(separate[1]);
+        }
+    }
+
+    const DEPARTMENT_TOTAL = 53;
+    const finalStr = `SD ${DEPARTMENT_TOTAL}/${counts.A}/${counts.B}/${counts.C}/${counts.D}/${counts.E}/${counts.F}/${counts.G}/${tbcPeople.length} (TBC: ${tbcPeople.join(', ')})
+
+The breakdown:
+SD Total: ${DEPARTMENT_TOTAL}
+Cat A: ${counts.A}
+Cat B: ${counts.B}
+Cat C: ${counts.C}
+Cat D: ${counts.D}
+Cat E: ${counts.E}
+Cat F: ${counts.F}
+Cat G: ${counts.G}
+TBC: ${tbcPeople.length}
+`;
+
     return finalStr;
 }
 
