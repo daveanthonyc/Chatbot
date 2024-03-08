@@ -127,6 +127,7 @@ export function heavenlyExamParser(str) {
     const splitLines = str.split('\n');
     const tbcPeople = [];
 
+    // Iterate through each line
     for (let i = 8 ; i < splitLines.length; i++) {
         const separate = splitLines[i].split('/');
 
